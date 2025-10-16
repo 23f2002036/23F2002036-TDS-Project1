@@ -11,8 +11,15 @@ class TaskPayload(BaseModel):
     secret: str
     evaluation_url: str
     # optional fields present in requests
-    attachments: Optional[List[Any]] = None
-    checks: Optional[List[str]] = None
+    attachments: Optional[List[Any]] = []
+    checks: Optional[List[str]] = []
+
+
+from pydantic import Field
+
+attachments: Optional[List[Any]] = Field(default=[], description="List of file attachments")
+checks: Optional[List[str]] = Field(default=[], description="Validation checks to perform")
+
 
 
 class PromptPayload(BaseModel):
