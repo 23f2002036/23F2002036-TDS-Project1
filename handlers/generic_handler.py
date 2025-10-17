@@ -81,7 +81,7 @@ async def handle_task(payload):
     max_llm_attempts = 3
     for attempt in range(max_llm_attempts):
         try:
-            llm_resp = llm_ops.query_llm(prompt)
+            llm_resp = llm_ops.query_llm(prompt, payload.model)
         except Exception as e:
             if attempt == max_llm_attempts - 1:
                 raise RuntimeError(f"LLM query failed: {e}")
@@ -209,3 +209,4 @@ async def handle_task(payload):
     _post_with_retries(payload.evaluation_url, response_payload)
 
     return response_payload
+
