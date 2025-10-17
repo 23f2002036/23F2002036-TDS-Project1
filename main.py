@@ -1,21 +1,29 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from models import TaskPayload, PromptPayload
 from handlers.generic_handler import handle_task
 from utils import llm_ops
 import os
-from dotenv import load_dotenv
 import requests
+import logging
+from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 EXPECTED_SECRET = os.getenv("TDS_SECRET")
 
-from fastapi.middleware.cors import CORSMiddleware
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("uvicorn")
 
+# Initialize FastAPI app
 app = FastAPI()
 
+# Enable CORS (can restrict origins later)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can restrict this if needed
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,10 +32,6 @@ app.add_middleware(
 @app.get("/")
 def home():
     return {"message": "FastAPI is live. Use POST /solve to submit tasks."}
-
-from fastapi.responses import JSONResponse
-import logging
-logger = logging.getLogger("uvicorn")
 
 @app.post(
     "/solve",
@@ -44,20 +48,15 @@ async def solve(payload: TaskPayload):
     try:
         response = await handle_task(payload)
         return JSONResponse(status_code=200, content=response)
-    except requests.exceptions.HTTPError as e:
-        logger.error(f"LLM error: {e.response.text}")
-        raise HTTPException(status_code=e.response.status_code, detail=f"LLM error: {e.response.text}")
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/generate")
 def generate(prompt_payload: PromptPayload):
-    """Generate text from the configured LLM.
-
-    This endpoint is a thin wrapper around `utils.llm_ops.query_llm` and
-    returns the raw LLM JSON response. It intentionally raises a 500
-    HTTP error if the LLM call fails.
+    """
+    Generate text from the configured LLM.
+    This endpoint wraps `utils.llm_ops.query_llm` and returns the raw LLM JSON response.
     """
     try:
         resp = llm_ops.query_llm(prompt_payload.prompt)
