@@ -1,5 +1,6 @@
 import os
 import requests
+from fastapi import HTTPException
 
 def query_llm(prompt, model="openai/gpt-3.5-turbo"):
     headers = {
@@ -11,20 +12,17 @@ def query_llm(prompt, model="openai/gpt-3.5-turbo"):
         "model": model,
         "messages": [{"role": "user", "content": prompt}]
     }
-    response = requests.post(url, headers=headers, json=payload)
-    response.raise_for_status()
-    data = response.json()
-    return data["choices"][0]["message"]["content"]
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        data = response.json()
+        return data["choices"][0]["message"]["content"]
+    except Exception as e:
+        logger.error(f"LLM call failed: {e}")
+        raise HTTPException(status_code=500, detail="LLM processing failed")
 
-try:
-    async def query_llm(prompt, model="openai/gpt-3.5-turbo"):
-        response = await call_llm(prompt, model)
-        return response
-
-except Exception as e:
-    logger.error(f"LLM call failed: {e}")
-    raise HTTPException(status_code=500, detail="LLM processing failed")
-
-if "files" not in llm_response:
-    raise HTTPException(status_code=500, detail="Missing 'files' in LLM response")
+# Validate LLM response
+def extract_files(llm_response):
+    if "files" not in llm_response:
+        raise HTTPException(status_code=500, detail="Missing 'files' in LLM response")
     return llm_response["files"]
