@@ -13,7 +13,8 @@ def query_llm(prompt):
     }
     response = requests.post(url, headers=headers, json=payload)
     response.raise_for_status()
-    return response.json()
+    data = response.json()
+    return data["choices"][0]["message"]["content"]
 
 try:
     response = await call_llm(...)
