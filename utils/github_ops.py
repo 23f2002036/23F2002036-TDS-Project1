@@ -28,8 +28,10 @@ def create_or_update_repo(repo_name: str, brief: str, files: Dict[str, str], upd
     try:
         repo = user.get_repo(repo_name)
         if not update_if_exists:
-            # if it exists and we shouldn't update, raise
-            raise RuntimeError(f"Repo {repo_name} already exists")
+            # Repo exists, skip creation and return existing info
+            pages_url = f"https://{username}.github.io/{repo_name}/"
+            commit_sha = repo.get_commits()[0].sha
+            return repo.html_url, commit_sha, pages_url
     except Exception:
         repo = None
 
