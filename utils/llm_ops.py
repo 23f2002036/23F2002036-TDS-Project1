@@ -17,7 +17,10 @@ def query_llm(prompt, model="openai/gpt-3.5-turbo"):
     return data["choices"][0]["message"]["content"]
 
 try:
-    response = await call_llm(...)
+    async def query_llm(prompt, model="openai/gpt-3.5-turbo"):
+        response = await call_llm(prompt, model)
+        return response
+
 except Exception as e:
     logger.error(f"LLM call failed: {e}")
     raise HTTPException(status_code=500, detail="LLM processing failed")
