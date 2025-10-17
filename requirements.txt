@@ -8,3 +8,5 @@ pytest
 pytest-playwright
 playwright
 jsonschema
+pydantic
+openai

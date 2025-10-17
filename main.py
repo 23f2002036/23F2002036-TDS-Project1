@@ -4,28 +4,52 @@ from handlers.generic_handler import handle_task
 from utils import llm_ops
 import os
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 EXPECTED_SECRET = os.getenv("TDS_SECRET")
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can restrict this if needed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def home():
     return {"message": "FastAPI is live. Use POST /solve to submit tasks."}
 
+from fastapi.responses import JSONResponse
+import logging
+logger = logging.getLogger("uvicorn")
 
-@app.post("/solve")
+@app.post(
+    "/solve",
+    summary="Submit a task brief",
+    description="Validates secret and generates a GitHub Pages app using LLM assistance",
+    response_description="Returns repo URL, commit SHA, and GitHub Pages URL"
+)
 async def solve(payload: TaskPayload):
+    logger.info(f"Received payload: {payload.dict()}")
+
     if payload.secret != EXPECTED_SECRET:
         raise HTTPException(status_code=403, detail="Invalid secret key")
+
     try:
         response = await handle_task(payload)
-        return response
+        return JSONResponse(status_code=200, content=response)
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"LLM error: {e.response.text}")
+        raise HTTPException(status_code=e.response.status_code, detail=f"LLM error: {e.response.text}")
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/generate")
 def generate(prompt_payload: PromptPayload):
