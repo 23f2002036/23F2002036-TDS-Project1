@@ -14,3 +14,13 @@ def query_llm(prompt):
     response = requests.post(url, headers=headers, json=payload)
     response.raise_for_status()
     return response.json()
+
+try:
+    response = await call_llm(...)
+except Exception as e:
+    logger.error(f"LLM call failed: {e}")
+    raise HTTPException(status_code=500, detail="LLM processing failed")
+
+if "files" not in llm_response:
+    raise HTTPException(status_code=500, detail="Missing 'files' in LLM response")
+    return llm_response["files"]
