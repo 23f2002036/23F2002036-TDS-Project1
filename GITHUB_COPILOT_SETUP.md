@@ -44,9 +44,9 @@ There are several ways to confirm Copilot is working:
 
 #### Method 1: Check the Status Bar
 - Look at the bottom-right corner of VS Code
-- You should see a GitHub Copilot icon (looks like a small robot or "{}·")
-- If it shows "✓" or is not grayed out, Copilot is active
-- Click the icon to see detailed status
+- You should see a GitHub Copilot icon or text label
+- If it's active (not grayed out or showing an error symbol), Copilot is working
+- Click the icon/label to see detailed status and options
 
 #### Method 2: Check Extension Status
 1. Go to Extensions (`Ctrl+Shift+X` / `Cmd+Shift+X`)
@@ -73,7 +73,7 @@ There are several ways to confirm Copilot is working:
 
 1. Click on the Accounts icon (👤) in the bottom-left corner of VS Code
 2. You should see your GitHub username listed
-3. Hover over it to see "GitHub (Copilot enabled)" or similar text
+3. Hover over it to see text indicating Copilot access is enabled
 
 ### 6. Check Copilot Settings
 
