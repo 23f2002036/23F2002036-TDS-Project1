@@ -53,6 +53,9 @@ This FastAPI application receives a task brief, validates it using a secret key,
 - Modular structure: handlers, utils, playwright, tests
 - Swagger metadata added for clarity
 
+## Additional Documentation
+- [GitHub Copilot Setup Guide](GITHUB_COPILOT_SETUP.md) - Learn how to verify GitHub Copilot Pro free access in VS Code
+
 ## License
 MIT
 
